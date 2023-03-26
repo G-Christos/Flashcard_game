@@ -22,7 +22,7 @@ def load_user(user_id):
 
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(20), nullable=False, unique=True)
+    username = db.Column(db.String(60), nullable=False, unique=True)
     password = db.Column(db.String(80), nullable=False)
 
 class RegisterForm(FlaskForm):
@@ -38,7 +38,7 @@ class RegisterForm(FlaskForm):
                 'That username already exists. Please choose a different one.')
 
 class LoginForm(FlaskForm):
-    username = StringField(validators=[InputRequired(), Length(min=4, max=20)], render_kw={"placeholder": "Username"})
+    username = StringField(validators=[InputRequired(), Length(min=4, max=60)], render_kw={"placeholder": "Username"})
     password = PasswordField(validators=[InputRequired(), Length(min=8, max=20)], render_kw={"placeholder": "Password"})
     submit = SubmitField('Login')
 
