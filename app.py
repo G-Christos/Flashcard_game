@@ -26,7 +26,7 @@ class User(db.Model, UserMixin):
     password = db.Column(db.String(80), nullable=False)
 
 class RegisterForm(FlaskForm):
-    username = StringField(validators=[InputRequired(), Length(min=4, max=20)], render_kw={"placeholder": "Username"})
+    username = StringField(validators=[InputRequired(), Length(min=4, max=60)], render_kw={"placeholder": "Username"})
     password = PasswordField(validators=[InputRequired(), Length(min=8, max=20)], render_kw={"placeholder": "Password"})
     submit = SubmitField('Register')
 
