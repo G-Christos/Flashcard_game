@@ -40,6 +40,7 @@
 
 <form method="POST" style="max-width: max-content; margin: 0 auto;">
     <p style="font-size:30px; margin-right: 10px;">What is the correct translation of <strong>{{ word }}</strong>?</p>
+    <p style="font-size:30px; margin-right: 10px;"> {{ hint }} </p>
     <div style="flex: 1;">
       <input style="padding: 0.5rem; font-size: 1.2rem; border: none; border-radius: 5px; border-bottom: 1px solid #ccc; width: 100%; text-align: center;" type="text" name="answer" required>
     <button style="padding: 0.5rem 1rem ; margin-top: 10px; font-size: 1.2rem; border-radius: 5px; border: 1px solid #009E87; font-weight: bold;" class="button is-primary" type="submit">Check Answer</button>

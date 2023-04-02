@@ -106,18 +106,23 @@ current_word_translation = ''
 @app.route('/dashboard', methods=['GET', 'POST'])
 @login_required
 def dashboard():
-    global current_word, current_word_translation
+    global current_word, current_word_translation, correct_answers, wrong_answers
     if request.method == 'POST':
         answer = request.form['answer']
         if answer.lower() == current_word_translation.lower():
             result = 'Correct!'
+            correct_answers += 1
         else:
             result = 'Wrong! The correct answer is "{}".'.format(current_word_translation)
+            # wrong_answers += 1
         current_word, current_word_translation = random.choice(list(bag_of_words.items()))
-        return render_template('dashboard.html', word=current_word, result=result)
+        return render_template('dashboard.html', word=current_word, result=result, hint=current_word_translation)
     else:
         current_word, current_word_translation = random.choice(list(bag_of_words.items()))
-        return render_template('dashboard.html', word=current_word)
+        correct_answers = 0
+        # wrong_answers = 0
+        return render_template('dashboard.html', word=current_word, hint=current_word_translation)
+
 
 @app.route('/logout', methods=['GET', 'POST'])
 @login_required
