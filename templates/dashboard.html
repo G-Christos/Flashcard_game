@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h1 class="title">
+  Dashboard
+</h1>
+<h2 class="subtitle" style="margin-top: 500;">
+  Welcome to Foreign Language Flashcard game!
+</h2>
+
+<br>
+<br>
+<br>
+<br>
+<br>
+
+<!--<form method="POST">-->
+<!--    <input type="text" name="answer" required>-->
+<!--    <input type="submit" value="Check Answer">-->
+<!--</form>-->
+
+<!--<form method="POST" style="max-width: max-content; margin: 0 auto;">-->
+<!--&lt;!&ndash;  <div style="margin-bottom: 0rem;">&ndash;&gt;-->
+<!--    <div>-->
+<!--      <p style="font-size:30px;">What is the correct translation of <strong>{{ word }}</strong>?</p>-->
+<!--      <input style="padding: 0.5rem; font-size: 1.2rem; border: none; border-radius: 4px; border-bottom: 1px solid #ccc;" type="text" name="answer" required>-->
+<!--    &lt;!&ndash; uncomment to go the check answer a row down   &ndash;&gt;-->
+<!--    &lt;!&ndash;    </div>&ndash;&gt;-->
+<!--    &lt;!&ndash;  <div>&ndash;&gt;-->
+<!--    <button style="padding: 0.5rem 1rem; font-size: 1.2rem; border-radius: 4px; border: 1px solid #009E87; font-weight: bold;" class="button is-primary" type="submit">Check Answer</button>-->
+<!--  </div>-->
+<!--</form>-->
+
+<!--<form method="POST" style="max-width: max-content; margin: 0 auto;">-->
+<!--<p style="font-size:30px;">What is the correct translation of <strong>{{ word }}</strong>?</p>-->
+<!--<input style="padding: 0.5rem; font-size: 1.2rem; border: none; border-radius: 4px; border-bottom: 1px solid #ccc;" type="text" name="answer" required>-->
+<!--<button style="padding: 0.5rem 1rem; font-size: 1.2rem; border-radius: 4px; border: 1px solid #009E87; font-weight: bold;" class="button is-primary" type="submit">Check Answer</button>-->
+<!--</form>-->
+
+<form method="POST" style="max-width: max-content; margin: 0 auto;">
+    <p style="font-size:30px; margin-right: 10px;">What is the correct translation of <strong>{{ word }}</strong>?</p>
+    <div style="flex: 1;">
+      <input style="padding: 0.5rem; font-size: 1.2rem; border: none; border-radius: 5px; border-bottom: 1px solid #ccc; width: 100%; text-align: center;" type="text" name="answer" required>
+    <button style="padding: 0.5rem 1rem ; margin-top: 10px; font-size: 1.2rem; border-radius: 5px; border: 1px solid #009E87; font-weight: bold;" class="button is-primary" type="submit">Check Answer</button>
+  </div>
+</form>
+
+
+{% if result %}
+    <p style="font-size:20px; margin-top: 10px;" >{{ result }}</p>
+{% endif %}
+
+{% endblock %}
+
+<!--<form>-->
+<!--  <div class="form-group" method="POST">-->
+<!--&lt;!&ndash;    <label for="exampleInputEmail1">Email address</label>&ndash;&gt;-->
+<!--    <input type="text" class="form-control" name="answer" aria-describedby="emailHelp" placeholder="type your answer">-->
+<!--    <small id="emailHelp" class="form-text text-muted">Hint... {{ current_word_translation }}</small>-->
+<!--  </div>-->
+<!--  <button type="submit" class="btn btn-primary">Submit/Check Answer</button>-->
+<!--</form>-->
+
+<!--<a class="question">-->
+<!--&lt;!&ndash;  "What is the meaning of: {}?".format(word)&ndash;&gt;-->
+<!--  What is the meaning of: {{ word }}?-->
+<!--</a>-->
