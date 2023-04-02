@@ -7,7 +7,25 @@ from wtforms.validators import InputRequired, Length, ValidationError
 from flask_bcrypt import Bcrypt
 # from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
-import os, random
+import os, random, sqlite3
+
+# create SQLite database if it doesn't exist
+if not os.path.exists("db.sqlite3"):
+    # print("Database db.sqlite3 does not exists!")
+    conn = sqlite3.connect('db.sqlite3') # db.sqlite3 database.db
+    cursor = conn.cursor()
+    # create User table
+    cursor.execute('''CREATE TABLE IF NOT EXISTS User (
+                    id INTEGER PRIMARY KEY,
+                    email TEXT UNIQUE,
+                    password TEXT,
+                    name TEXT NOT NULL,
+                    age INTEGER NOT NULL,
+                    gender TEXT NOT NULL DEFAULT 'Male' CHECK(gender in ('male', 'female', 'other')), 
+                    date_signup DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+                    )''')
+    conn.commit()
+    conn.close()
 
 app = Flask(__name__) # package that contain the application, new app
 db = SQLAlchemy(app) # create database instance
@@ -29,9 +47,11 @@ class User(UserMixin, db.Model):
     email = db.Column(db.String(100), unique=True)
     password = db.Column(db.String(100))
     name = db.Column(db.String(100), nullable=False)
-    gender = db.Column(db.String, nullable=False,   # default="male" check(gender in ('Female', 'Male', 'Other'))
+    gender = db.Column(db.String, nullable=False)
     age = db.Column(db.Integer, nullable=False)
-    date_signup = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    date_signup = db.Column(db.DateTime, nullable=False, default=datetime.now())
+    # default="male"
+    # check(gender in ('Female', 'Male', 'Other'))
 
 @app.route('/favicon.ico')
 def favicon():
@@ -52,6 +72,7 @@ def login_post():
     hashed_password = bcrypt.generate_password_hash(password) # 1st appr.
     remember = True if request.form.get('remember') else False
     user = User.query.filter_by(email=email).first()
+
     if not user or not bcrypt.check_password_hash(user.password, password): # 1st appr.
         flash('Please check your login details and try again.')
         return redirect(url_for('login'))
@@ -59,19 +80,26 @@ def login_post():
     return redirect(url_for('dashboard'))
 
 #### built the game here ####
-bag_of_words = {
-    'die Anmerkung': 'simeiosi',
-    'die Auflage': 'stroma',
-    'die Aufklärung': 'eksigisi',
-    'aufschreiben - notieren': 'simeiono',
-    'die Dichtung': 'poiisi',
-    'die Reinheit': 'agnotita',
-    'derentwillen': 'eksaitias tis thelisis tous',
-    'die Neigung - Vorliebe': 'protimisi',
-    'die Poesie': 'poiisi',
-    'umstritten': 'epimaxos',
-    'die Grausamkeit': 'thiriodia'
-}
+import pandas as pd
+# Read the Excel file into a pandas DataFrame
+df = pd.read_excel('bag_of_words.xlsx')
+# Convert the DataFrame into a dictionary
+bag_of_words = dict(zip(df.iloc[:,0], df.iloc[:,1]))
+# print(bag_of_words)
+
+# bag_of_words = {
+#     'die Anmerkung': 'simeiosi',
+#     'die Auflage': 'stroma',
+#     'die Aufklärung': 'eksigisi',
+#     'aufschreiben - notieren': 'simeiono',
+#     'die Dichtung': 'poiisi',
+#     'die Reinheit': 'agnotita',
+#     'derentwillen': 'eksaitias tis thelisis tous',
+#     'die Neigung - Vorliebe': 'protimisi',
+#     'die Poesie': 'poiisi',
+#     'umstritten': 'epimaxos',
+#     'die Grausamkeit': 'thiriodia'
+# }
 current_word = ''
 current_word_translation = ''
 
@@ -99,8 +127,10 @@ def logout():
 
 @ app.route('/profile')
 @login_required
-def profile():
-    return render_template('profile.html', name=current_user.name)
+def profile():                    # 2023-04-02 22:55:10.211851
+    date_obj = datetime.strptime(str(current_user.date_signup), '%Y-%m-%d %H:%M:%S.%f')
+    formatted_date = date_obj.strftime('%d-%m-%Y')
+    return render_template('profile.html', name=current_user.name,email=current_user.email,age=current_user.age,gender=current_user.gender,date_signup=formatted_date)
 
 @ app.route('/signup')
 def signup():
@@ -111,12 +141,16 @@ def signup_post():
     email = request.form.get('email')
     name = request.form.get('name')
     password = request.form.get('password')
+    age = int(request.form.get('age'))
+    gender = request.form.get('gender')
+    # date_signup = request.form.get('date_signup')
+
     user = User.query.filter_by(email=email).first()
     if user:
         flash('Email address already exists.')
         return redirect(url_for('login')) # signup
     hashed_password = bcrypt.generate_password_hash(password) # 1st appr.
-    new_user = User(email=email, name=name, password=hashed_password) # 1st appr.
+    new_user = User(email=email, name=name, password=hashed_password, age=age, gender=gender) # 1st appr.
     # new_user = User(email=email, name=name, password=generate_password_hash(password, method='sha256'))
     db.session.add(new_user)
     db.session.commit()
@@ -132,4 +166,6 @@ if __name__ == "__main__":
 
 # sqlite3 db.sqlite3
 # select * from user;
+
+
 
