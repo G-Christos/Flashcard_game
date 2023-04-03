@@ -1,3 +1,4 @@
+# import libraries/packages
 from flask import Flask, render_template, url_for, redirect, Blueprint, request, flash, send_from_directory
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin, login_user, LoginManager, login_required, logout_user, current_user
@@ -5,9 +6,8 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField
 from wtforms.validators import InputRequired, Length, ValidationError
 from flask_bcrypt import Bcrypt
-# from werkzeug.security import generate_password_hash, check_password_hash
+import os, random, sqlite3, pandas as pd
 from datetime import datetime
-import os, random, sqlite3
 
 # create SQLite database if it doesn't exist
 if not os.path.exists("db.sqlite3"):
@@ -27,9 +27,10 @@ if not os.path.exists("db.sqlite3"):
     conn.commit()
     conn.close()
 
+# create Flask app & configuration
 app = Flask(__name__) # package that contain the application, new app
 db = SQLAlchemy(app) # create database instance
-bcrypt = Bcrypt(app)
+bcrypt = Bcrypt(app) # add encryption to app
 # import database //// --> absolute path VS /// --> relative path
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.sqlite3' # 'sqlite:///database.db'
 app.config['SECRET_KEY'] = 'thisisasecretkey'
@@ -80,7 +81,8 @@ def login_post():
     return redirect(url_for('dashboard'))
 
 #### built the game here ####
-import pandas as pd
+
+# Load the words from excel file
 # Read the Excel file into a pandas DataFrame
 df = pd.read_excel('bag_of_words.xlsx')
 # Convert the DataFrame into a dictionary
@@ -102,6 +104,10 @@ bag_of_words = dict(zip(df.iloc[:,0], df.iloc[:,1]))
 # }
 current_word = ''
 current_word_translation = ''
+correct_answers = 0
+wrong_answers = 0
+known_words = []
+unknown_words = []
 
 @app.route('/dashboard', methods=['GET', 'POST'])
 @login_required
@@ -112,17 +118,23 @@ def dashboard():
         if answer.lower() == current_word_translation.lower():
             result = 'Correct!'
             correct_answers += 1
+            if correct_answers % 5 == 0:
+                result = "Good job! {}th correct answer in a row!".format(correct_answers)
+            known_words.append(current_word)
         else:
             result = 'Wrong! The correct answer is "{}".'.format(current_word_translation)
-            # wrong_answers += 1
+            wrong_answers += 1
+            unknown_words.append(current_word) # put wrong answers in the list
+            # print("Deine Vokabeln sind zu erweitern.")  # Το λεξιλόγιό σας πρέπει να επεκταθεί.
+            # print("Bis nächstes Mal!")  # Θα σε δω την επόμενη φορά!
+            # Game Over & print/store report
         current_word, current_word_translation = random.choice(list(bag_of_words.items()))
         return render_template('dashboard.html', word=current_word, result=result, hint=current_word_translation)
     else:
         current_word, current_word_translation = random.choice(list(bag_of_words.items()))
         correct_answers = 0
-        # wrong_answers = 0
+        wrong_answers = 0
         return render_template('dashboard.html', word=current_word, hint=current_word_translation)
-
 
 @app.route('/logout', methods=['GET', 'POST'])
 @login_required
@@ -148,7 +160,6 @@ def signup_post():
     password = request.form.get('password')
     age = int(request.form.get('age'))
     gender = request.form.get('gender')
-    # date_signup = request.form.get('date_signup')
 
     user = User.query.filter_by(email=email).first()
     if user:

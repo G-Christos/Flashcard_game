@@ -1,22 +1,17 @@
 {% extends "base.html" %}
 
 {% block content %}
+
 <h1 class="title">
-<!--  Flask Login Example-->
   Welcome to Foreign Language Flashcard game!
 </h1>
 
-
 <h2 class="subtitle">
-<!--  Easy authentication and authorization in Flask.-->
   <a href="{{ url_for('login') }}"> Please login to start!</a>
 </h2>
 
 {% if current_user.is_authenticated %}
-<meta http-equiv="Refresh" content="0; url={{ url_for('dashboard') }}" />
-<!--<a style="text-align: center;" href="{{ url_for('dashboard') }}" class="navbar-item" >-->
-<!--    Start the Game!-->
-<!--</a>-->
+  <meta http-equiv="Refresh" content="0; url={{ url_for('dashboard') }}" />
 {% endif %}
 
 {% endblock %}
